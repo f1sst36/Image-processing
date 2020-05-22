@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Adobe Zhekos</title>
+	<!--<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">-->
+	<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+	<link rel="stylesheet" href="style/animate.css" />
+	<link rel="stylesheet" href="style/bootstrap/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="style/style.css" />
+</head>
+<body>
+
+<div class="container-fluid" style="height: 100%;">
+	<div class="row icons-row" style="height: 100%;">
+		<div class="col-lg-3 icons-colomn pr-0 pl-0" style="height: 100%;">
+			<div class="row" style="height: 100%; width: 100%; margin: 0;">
+				<div class="col-lg-3 pr-0 pl-0">
+					<ul class="left-menu middle">
+						<li class="btn btn1 image left-btn-active"><i class="fa fa-picture-o" aria-hidden="true"></i></li>
+						<li class="btn btn1 filtersBtn"><i class="fa fa-sliders" aria-hidden="true"></i></li>
+						<!--<li class="btn btn1 cropImg"><i class="fa fa-crop" aria-hidden="true"></i></li>-->
+						<li class="btn btn1 graph"><i class="fa fa-bar-chart" aria-hidden="true"></i></li>
+					</ul>
+				</div>
+				<div class="col-lg-9 pl-0 pr-0 icons-colomn-settings" style="height: 100%;">
+					<div class="big-buttons">
+						<div class="big-button" id="buttonFile">
+							<i class="fa fa-download" aria-hidden="true"></i>
+							<input type="file" name="file" id="file" class="inputfile" accept="image/jpeg,image/jpg,image/png,image/bmp" />
+							<label for="file"><p style="margin: 20px 0 0 0;">Загрузить</p></label>
+						</div>
+						<div class="big-button" id="downloadImg">
+							<i class="fa fa-upload" aria-hidden="true"></i>
+							<br /><a href="" style="color: #4470a8;"><label>Скачать</label></a>
+						</div>
+						<div class="big-button" id="aboutImg">
+							<i class="fa fa-info" aria-hidden="true"></i>
+							<br /><p>О файле</p>
+						</div>
+						<div class="big-button" onClick="ClearCanvas();">
+							<i class="fa fa-eraser" aria-hidden="true"></i>
+							<br /><p>Очистить</p>
+						</div>
+					</div>
+					
+					<div class="filters" style="display: none;">
+						<p>Яркость</p>
+						<input id="brightness" type="range" min="0" max="100" step="1" value="50" class="slider"><br />
+						<p>Контрастность</p>
+						<input id="contrast" type="range" min="0" max="100" step="1" value="50" class="slider">
+						<p>Негатив</p>
+						<input id="negative" class="filter_checkbox" type="checkbox"><br />
+						<p>Черно-белое</p>
+						<input id="blackAndWhite" class="filter_checkbox" type="checkbox"><br />
+						<p>Бинаризация</p>
+						<input class="color" type="color"> <input class="color" type="color"><br />
+						<input id="binarization" type="range" min="0" max="100" step="1" value="50" class="slider"><br />
+						<button onClick="TurnOnProfile()" class="big-button" style="margin: 50px 0 0 0;">Профиль яркости</button>
+						<button onClick="ClearChanges()" class="big-button" style="margin: 20px 0 0 0;">Убрать все изменения</button>
+					</div>
+
+					<div class="graphs" style="display: none;">
+						<h5>Гистограмма по яркости</h5>
+						<div id="chart" style=""></div>
+						<h5>Гистограмма по красному</h5>
+						<div id="chartR" style=""></div>
+						<h5>Гистограмма по зеленому</h5>
+						<div id="chartG" style=""></div>
+						<h5>Гистограмма по синему</h5>
+						<div id="chartB" style=""></div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+		<div class="col-lg-9 field-picture" id="canv-parent" style="padding: 0;">
+			<canvas id="canvas">no canvas</canvas>
+			<div class="coords-bar">
+				<p class="coords"></p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="about animated">
+	<div class="about-window">
+		<h4>Информация</h4>
+		<hr style="background-color: #9e9e9e;">
+		<p></p>
+		<p></p>
+		<p></p>
+		<p></p>
+		<div class="about-window-ok">
+			<h4>OK</h4>
+		</div>
+	</div>
+</div>
+
+<div id="profile-pop">
+	<div id="profile-pop-r"></div>
+	<div id="profile-pop-g"></div>
+	<div id="profile-pop-b"></div>
+</div>
+
+<div class="error animated">
+	<p></p>
+</div>
+
+<script src="script/lib/apexcharts/dist/apexcharts.min.js"></script>
+<script src="script/graphs.js"></script>
+<script src="script/main.js"></script>
+<script src="script/profile.js"></script>
+<script src="script/brightness.js"></script>
+<script src="script/contrast.js"></script>
+</body>
+</html>
