@@ -268,32 +268,12 @@ filter_checkboxs.forEach(function(checkbox){
 });
 
 function CheckChenges(checkbox){
-	/*filter_checkboxs.forEach(function(checkbox){
-		if(checkbox.checked){
-			checkbox.checked = false;
-			eval("reverse_" + checkbox.id + "()");
-		}
-	});*/
 	if(checkbox.checked && (img != null)){
 		eval(checkbox.id + "()");
 	}else{
 		eval("reverse_" + checkbox.id + "()");
 	}
 }
-
-/*
-document.getElementsByClassName('cropImg')[0].addEventListener('click', function(){
-	    cropImage(
-	        img,
-	        ctx,
-	        miniCtx, {
-	        x : img.width / 4,
-	        y : img.height / 4,
-	        width : img.width / 2,
-	        height : img.height / 2,
-	    });
-});
-*/
 
 let btns = document.getElementsByClassName('btn1');
 for(let i = 0; i < btns.length ; i++){
@@ -304,16 +284,7 @@ for(let i = 0; i < btns.length ; i++){
 		this.classList.add('left-btn-active');
 	});
 }
-/*
-let negative_checkbox = document.getElementById('negative_checkbox');
-negative_checkbox.addEventListener('change', function(){
-	//if(negative_checkbox.checked){
-		negative();
-	//}else if(!negative_checkbox.checked && baw_checkbox.checked){
-	//	reverseNegative();
-	//}
-});
-*/
+
 function negative(){
 	for(let i = 0; i < imgData.data.length; i += 4){
 		imgData.data[i] = 255 - imgData.data[i];
@@ -328,12 +299,7 @@ function negative(){
 
 	boolChanges = true;
 }
-/*
-let baw_checkbox = document.getElementById('baw_checkbox');
-baw_checkbox.addEventListener('change', function(){
-	baw_checkbox.checked ?  blackAndWhite() : reverseBlackAndWhite();
-})
-*/
+
 function reverse_negative(){
 	negative();
 
@@ -401,12 +367,10 @@ binarizationItem.addEventListener('input', function(){
 function binarization(threshold, color1, color2){
 	for(let i = 0; i < imgData.data.length; i += 4){
 		if( ((startImgData.data[i] + startImgData.data[i + 1] + startImgData.data[i + 2]) / 3) >= threshold ){
-			//imgData.data[i + 3] = 255
 			imgData.data[i] = color1.r;
 			imgData.data[i + 1] = color1.g;
 			imgData.data[i + 2] = color1.b;
 		}else{
-			//imgData.data[i + 3] = 0
 			imgData.data[i] = color2.r;
 			imgData.data[i + 1] = color2.g;
 			imgData.data[i + 2] = color2.b;
@@ -418,4 +382,30 @@ function binarization(threshold, color1, color2){
 	ctx.putImageData(imgData, (canv.width - imgData.width) / 2, (canv.height - imgData.height) / 2);
 
 	boolChanges = true;
+}
+
+
+const noiseSlider = document.querySelector('#noise')
+noiseSlider.addEventListener('input', () => setNoise(Number(noiseSlider.value)))
+function setNoise(noiseMul){
+	for (let i = 0; i < imgData.data.length; i += 4) {
+        let v = (imgData.data[i] + imgData.data[i + 1] + imgData.data[i + 2]) / 3;
+        imgData.data[i] = v >= 127 ? 0 : 255;
+        imgData.data[i + 1] = v >= 127 ? 0 : 255;
+        imgData.data[i + 2] = v >= 127 ? 0 : 255;
+    }
+
+    for (let i = 0; i < imgData.data.length; i += 4) {
+        let isBlack = imgData.data[i] == 0 ? true : false;
+		let rand = Math.random();
+
+        imgData.data[i] = isBlack ? (rand >= noiseMul ? 0 : 255) : (rand >= noiseMul ? 255 : 0);
+        imgData.data[i + 1] = isBlack ? (rand >= noiseMul ? 0 : 255) : (rand >= noiseMul ? 255 : 0);
+        imgData.data[i + 2] = isBlack ? (rand >= noiseMul ? 0 : 255) : (rand >= noiseMul ? 255 : 0);
+	}
+	
+	ctx.clearRect(0, 0, canv.width, canv.height);
+	ctx.fillStyle = mainCanvasBGC;
+	ctx.fillRect(0, 0, canv.width, canv.height);
+	ctx.putImageData(imgData, (canv.width - imgData.width) / 2, (canv.height - imgData.height) / 2);
 }
