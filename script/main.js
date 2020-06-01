@@ -7,7 +7,8 @@ var boolChanges = false;
 
 var ctx = canv.getContext('2d');
 
-let mainCanvasBGC = '#15191E';
+// #15191E
+let mainCanvasBGC = '#fff';
 
 makeGraph();
 
@@ -63,7 +64,7 @@ function handleImage(e){
 		    infoImg[1].innerHTML = (`<b>Разрешение: </b>` + img.width + 'px x ' + img.height + 'px');
 		    infoImg[2].innerHTML = (`<b>Тип файла: </b>` + inputFile.files[0].type);
 		    infoImg[3].innerHTML = (`<b>Размер: </b>` + ((inputFile.files[0].size / 1024) / 1024).toFixed(3) + 'MB');
-        }
+		}
         img.src = event.target.result;
     }
     reader.readAsDataURL(e.target.files[0]);
@@ -142,6 +143,7 @@ function ClearChanges(){
 		binarizationItem.value = 50;
 		brightnessItem.value = 50;
 		contrastItem.value = 50;
+		noiseSlider.value = 0
 
 		boolChanges = true;
 
@@ -238,22 +240,33 @@ document.querySelector('#canv-parent').addEventListener('wheel', function(e){
 let bigButtons = document.getElementsByClassName('big-buttons')[0];
 let filters = document.getElementsByClassName('filters')[0];
 let graphs = document.getElementsByClassName('graphs')[0];
+let true_filters = document.getElementsByClassName('true-filters')[0]
 
 document.getElementsByClassName('filtersBtn')[0].addEventListener('click', function(){
 	bigButtons.style.display = 'none';
 	graphs.style.display = 'none';
+	true_filters.style.display = 'none'
 	filters.style.display = 'block';
 });
 
 document.getElementsByClassName('image')[0].addEventListener('click', function(){
 	filters.style.display = 'none';
 	graphs.style.display = 'none';
+	true_filters.style.display = 'none'
 	bigButtons.style.display = 'block';
+});
+
+document.getElementsByClassName('filter')[0].addEventListener('click', function(){
+	filters.style.display = 'none';
+	graphs.style.display = 'none';
+	bigButtons.style.display = 'none';
+	true_filters.style.display = 'block'
 });
 
 document.getElementsByClassName('graph')[0].addEventListener('click', function(){
 	filters.style.display = 'none';
 	bigButtons.style.display = 'none';
+	true_filters.style.display = 'none'
 	graphs.style.display = 'block';
 
 	updateGraph();
@@ -386,15 +399,18 @@ function binarization(threshold, color1, color2){
 
 
 const noiseSlider = document.querySelector('#noise')
-noiseSlider.addEventListener('input', () => setNoise(Number(noiseSlider.value)))
+noiseSlider.addEventListener('input', () => setNoise(Number(noiseSlider.value)), false)
 function setNoise(noiseMul){
-	for (let i = 0; i < imgData.data.length; i += 4) {
-        let v = (imgData.data[i] + imgData.data[i + 1] + imgData.data[i + 2]) / 3;
-        imgData.data[i] = v >= 127 ? 0 : 255;
-        imgData.data[i + 1] = v >= 127 ? 0 : 255;
-        imgData.data[i + 2] = v >= 127 ? 0 : 255;
-    }
+	ctx.putImageData(startImgData, (canv.width - imgData.width) / 2, (canv.height - imgData.height) / 2);
+	imgData = ctx.getImageData((canv.width - imgData.width) / 2, ((canv.height - imgData.height) / 2), width, height);
 
+	for (let i = 0; i < imgData.data.length; i += 4) {
+		let v = (imgData.data[i] + imgData.data[i + 1] + imgData.data[i + 2]) / 3;
+		imgData.data[i] = v >= 127 ? 0 : 255;
+		imgData.data[i + 1] = v >= 127 ? 0 : 255;
+		imgData.data[i + 2] = v >= 127 ? 0 : 255;
+	}
+	
     for (let i = 0; i < imgData.data.length; i += 4) {
         let isBlack = imgData.data[i] == 0 ? true : false;
 		let rand = Math.random();
@@ -403,9 +419,7 @@ function setNoise(noiseMul){
         imgData.data[i + 1] = isBlack ? (rand >= noiseMul ? 0 : 255) : (rand >= noiseMul ? 255 : 0);
         imgData.data[i + 2] = isBlack ? (rand >= noiseMul ? 0 : 255) : (rand >= noiseMul ? 255 : 0);
 	}
-	
+
 	ctx.clearRect(0, 0, canv.width, canv.height);
-	ctx.fillStyle = mainCanvasBGC;
-	ctx.fillRect(0, 0, canv.width, canv.height);
 	ctx.putImageData(imgData, (canv.width - imgData.width) / 2, (canv.height - imgData.height) / 2);
 }

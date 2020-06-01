@@ -20,49 +20,65 @@
 						<li class="btn btn1 image left-btn-active"><i class="fa fa-picture-o" aria-hidden="true"></i></li>
 						<li class="btn btn1 filtersBtn"><i class="fa fa-sliders" aria-hidden="true"></i></li>
 						<!--<li class="btn btn1 cropImg"><i class="fa fa-crop" aria-hidden="true"></i></li>-->
+						<li class="btn btn1 filter"><i class="fa fa-filter" aria-hidden="true"></i></li>
 						<li class="btn btn1 graph"><i class="fa fa-bar-chart" aria-hidden="true"></i></li>
 					</ul>
 				</div>
 				<div class="col-lg-9 pl-0 pr-0 icons-colomn-settings" style="height: 100%;">
 					<div class="big-buttons">
+						<h4 class="block-title">Изображение</h4>
 						<div class="big-button" id="buttonFile">
 							<i class="fa fa-download" aria-hidden="true"></i>
 							<input type="file" name="file" id="file" class="inputfile" accept="image/jpeg,image/jpg,image/png,image/bmp" />
-							<label for="file"><p style="margin: 20px 0 0 0;">Загрузить</p></label>
+							<label for="file" style="margin: 0;"><p >Загрузить</p></label>
 						</div>
 						<div class="big-button" id="downloadImg">
 							<i class="fa fa-upload" aria-hidden="true"></i>
-							<br /><a href="" style="color: #4470a8;"><label>Скачать</label></a>
+							<a href="" style="color: #4470a8;"><label style="margin: 0;">Скачать</label></a>
 						</div>
 						<div class="big-button" id="aboutImg">
 							<i class="fa fa-info" aria-hidden="true"></i>
-							<br /><p>О файле</p>
+							<p>О файле</p>
 						</div>
 						<div class="big-button" onClick="ClearCanvas();">
 							<i class="fa fa-eraser" aria-hidden="true"></i>
-							<br /><p>Очистить</p>
+							<p>Очистить</p>
 						</div>
 					</div>
 					
 					<div class="filters" style="display: none;">
-						<p>Яркость</p>
-						<input id="brightness" type="range" min="0" max="100" step="1" value="50" class="slider"><br>
-						<p>Контрастность</p>
-						<input id="contrast" type="range" min="0" max="100" step="1" value="50" class="slider"><br>
-						<p>Шум</p>
-						<input id="noise" type="range" min="0" max="0.4" step="0.01" value="0" class="slider">
-						<p>Негатив</p>
-						<input id="negative" class="filter_checkbox" type="checkbox"><br />
-						<p>Черно-белое</p>
-						<input id="blackAndWhite" class="filter_checkbox" type="checkbox"><br />
-						<p>Бинаризация</p>
-						<input class="color" type="color"> <input class="color" type="color"><br />
-						<input id="binarization" type="range" min="0" max="100" step="1" value="50" class="slider"><br />
-						<button onClick="TurnOnProfile()" class="big-button" style="margin: 50px 0 0 0;">Профиль яркости</button>
-						<button onClick="ClearChanges()" class="big-button" style="margin: 20px 0 0 0;">Убрать все изменения</button>
+						<h4 class="block-title">Настройки</h4>
+						<div class="settings">
+							<p>Яркость</p>
+							<input id="brightness" type="range" min="0" max="100" step="1" value="50" class="slider"><br>
+							<p>Контрастность</p>
+							<input id="contrast" type="range" min="0" max="100" step="1" value="50" class="slider"><br>
+							<p>Шум</p>
+							<input id="noise" type="range" min="0" max="0.4" step="0.01" value="0" class="slider">
+							<p>Негатив</p>
+							<input id="negative" class="filter_checkbox" type="checkbox"><br />
+							<p>Черно-белое</p>
+							<input id="blackAndWhite" class="filter_checkbox" type="checkbox"><br />
+							<p>Бинаризация</p>
+							<input class="color" type="color"> <input class="color" type="color"><br />
+							<input id="binarization" type="range" min="0" max="100" step="1" value="50" class="slider"><br />
+						</div>
+						<button onClick="TurnOnProfile()" class="big-button" style="margin: 30px auto;">Профиль яркости</button>
+						<!--<button onClick="ClearChanges()" class="big-button" style="margin: 10px auto;">Убрать все изменения</button>-->
+					</div>
+
+					<div class="true-filters" style="display: none;">
+						<h4 class="block-title">Фильтры</h4>
+						<div class="buttons">
+							<button>123</button>
+							<button>123</button>
+							<button>123</button>
+							<button>123</button>
+						</div>
 					</div>
 
 					<div class="graphs" style="display: none;">
+						<h4 class="block-title">Гистограммы</h4>
 						<h5>Гистограмма по яркости</h5>
 						<div id="chart" style=""></div>
 						<h5>Гистограмма по красному</h5>
@@ -77,6 +93,9 @@
 			</div>
 		</div>
 		<div class="col-lg-9 field-picture" id="canv-parent" style="padding: 0;">
+			<div class="clear-button-outer">
+				<button onClick="ClearChanges()">Очистить изменения</button>
+			</div>
 			<canvas id="canvas">no canvas</canvas>
 			<div class="coords-bar">
 				<p class="coords"></p>
