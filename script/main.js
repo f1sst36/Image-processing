@@ -1,11 +1,12 @@
 var canv = document.querySelector("#canvas");
-const miniCanv = document.querySelector("#mini-canvas");
+const BGcanvas = document.querySelector("#BG-canvas");
 var canvParent = document.querySelector("#canv-parent");
 
 var imgData, startImgData, beforeBAW;
 var boolChanges = false;
 
 var ctx = canv.getContext('2d');
+var BGctx = BGcanvas.getContext('2d')
 
 // #15191E
 let mainCanvasBGC = '#fff';
@@ -24,8 +25,9 @@ var img, width, height;
 function handleImage(e){
     let reader = new FileReader();
     reader.onload = function(event){
-    	canv.width = document.querySelector('#canv-parent').offsetWidth;
-		canv.height = document.querySelector('#canv-parent').offsetHeight;
+    	BGcanvas.width = document.querySelector('#canv-parent').offsetWidth;
+		BGcanvas.height = document.querySelector('#canv-parent').offsetHeight;
+
 
     	ctx.clearRect(0, 0, canv.width, canv.height);
 
@@ -47,14 +49,21 @@ function handleImage(e){
 			nowWidth = width;
 			nowHeight = height;
 
-	        ctx.fillStyle = mainCanvasBGC;
-	        ctx.fillRect(0, 0, canv.width, canv.height);
-			ctx.drawImage(img, (canv.width - width) / 2, (canv.height - height) / 2, width , height);
+			canv.style.width = width + 'px'
+			canv.style.height = height + 'px'
 
-			startImgData = ctx.getImageData((canv.width - width) / 2, (canv.height - height) / 2, width, height);
-			imgData = ctx.getImageData((canv.width - width) / 2, (canv.height - height) / 2, width, height);
+	        BGctx.fillStyle = '#2E2E2E';
+			BGctx.drawImage(img, 0, 0, BGcanvas.width, BGcanvas.height);
+			ctx.drawImage(img, 0, 0, canv.width, canv.height);
+			
+
+			startImgData = ctx.getImageData(0, 0, canv.width, canv.height);
+			imgData = ctx.getImageData(0, 0, canv.width, canv.height);
 
         	boolChanges = true;
+
+			
+			//console.log(height)
 
 			let infoImg = document.querySelector('.about-window').getElementsByTagName('p');
 			inputFile = document.getElementsByClassName('inputfile')[0];
@@ -73,7 +82,7 @@ function handleImage(e){
 let downloadImg = document.querySelector('#downloadImg');
 
 downloadImg.addEventListener('click', function(){
-	if(img == undefined){
+	if((img == undefined) && (img == null)){
 		popError('На полотне отсутствует<br />изображение.');
 	}else{
 		let dataURL = canv.toDataURL("image/jpeg");
@@ -86,7 +95,7 @@ downloadImg.addEventListener('click', function(){
 let aboutImg = document.querySelector('#aboutImg');
 
 aboutImg.addEventListener('click', function(){
-	if(img != undefined){
+	if((img != undefined)  || (img != null)){
 		document.getElementsByClassName('about')[0].style.display = 'block';
 		document.getElementsByClassName('about')[0].classList.add('faster');
 		animateCSS(document.getElementsByClassName('about')[0], 'fadeIn');
@@ -103,12 +112,14 @@ document.getElementsByClassName('about-window-ok')[0].addEventListener('click', 
 });
 
 function ClearCanvas(){
-	if(img == undefined){
+	if((img == undefined)  && (img == null)){
 		popError('На полотне отсутствует<br />изображение.');
 	}else{
 		ctx.clearRect(0, 0, canv.width, canv.height);
 		ctx.fillStyle = mainCanvasBGC;
 		ctx.fillRect(0, 0, canv.width, canv.height);
+		BGctx.fillStyle = mainCanvasBGC;
+		BGctx.fillRect(0, 0, BGcanvas.width, BGcanvas.height);
 
 		imgData = null;
 		startImgData = null;
@@ -135,7 +146,8 @@ function ClearChanges(){
 		ctx.clearRect(0, 0, canv.width, canv.height);
 		ctx.fillStyle = mainCanvasBGC;
 		ctx.fillRect(0, 0, canv.width, canv.height);
-		ctx.putImageData(startImgData, (canv.width - imgData.width) / 2, (canv.height - imgData.height) / 2);
+		ctx.putImageData(startImgData, 0, 0);
+		//ctx.drawImage(img, 0, 0, canv.width, canv.height);
 
 		filter_checkboxs.forEach(function(checkbox){
 			checkbox.checked = false;
@@ -148,6 +160,8 @@ function ClearChanges(){
 		boolChanges = true;
 
 		imgData.data = [...startImgData.data];
+		blackAndWhite()
+		reverse_blackAndWhite()
 	}
 }
 
@@ -308,7 +322,7 @@ function negative(){
 	ctx.clearRect(0, 0, canv.width, canv.height);
 	ctx.fillStyle = mainCanvasBGC;
 	ctx.fillRect(0, 0, canv.width, canv.height);
-	ctx.putImageData(imgData, (canv.width - imgData.width) / 2, (canv.height - imgData.height) / 2);
+	ctx.putImageData(imgData, 0, 0);
 
 	boolChanges = true;
 }
@@ -321,7 +335,7 @@ function reverse_negative(){
 
 function blackAndWhite(){
 
-	beforeBAW = ctx.getImageData((canv.width - width) / 2, (canv.height - height) / 2, width, height);
+	beforeBAW = ctx.getImageData(0, 0, canv.width, canv.height);;
 
 	negative();
 	for(let i = 0; i < imgData.data.length; i += 4){
@@ -336,7 +350,7 @@ function blackAndWhite(){
 	ctx.clearRect(0, 0, canv.width, canv.height);
 	ctx.fillStyle = mainCanvasBGC;
 	ctx.fillRect(0, 0, canv.width, canv.height);
-	ctx.putImageData(imgData, (canv.width - imgData.width) / 2, (canv.height - imgData.height) / 2);
+	ctx.putImageData(imgData, 0, 0);
 	
 	negative();
 
@@ -354,7 +368,7 @@ function reverse_blackAndWhite(){
 	ctx.clearRect(0, 0, canv.width, canv.height);
 	ctx.fillStyle = mainCanvasBGC;
 	ctx.fillRect(0, 0, canv.width, canv.height);
-	ctx.putImageData(imgData, (canv.width - imgData.width) / 2, (canv.height - imgData.height) / 2);
+	ctx.putImageData(imgData, 0, 0);
 
 	boolChanges = true;
 }
@@ -392,7 +406,7 @@ function binarization(threshold, color1, color2){
 	ctx.clearRect(0, 0, canv.width, canv.height);
 	ctx.fillStyle = mainCanvasBGC;
 	ctx.fillRect(0, 0, canv.width, canv.height);
-	ctx.putImageData(imgData, (canv.width - imgData.width) / 2, (canv.height - imgData.height) / 2);
+	ctx.putImageData(imgData, 0, 0);
 
 	boolChanges = true;
 }
@@ -401,8 +415,8 @@ function binarization(threshold, color1, color2){
 const noiseSlider = document.querySelector('#noise')
 noiseSlider.addEventListener('input', () => setNoise(Number(noiseSlider.value)), false)
 function setNoise(noiseMul){
-	ctx.putImageData(startImgData, (canv.width - imgData.width) / 2, (canv.height - imgData.height) / 2);
-	imgData = ctx.getImageData((canv.width - imgData.width) / 2, ((canv.height - imgData.height) / 2), width, height);
+	ctx.putImageData(startImgData, 0, 0);
+	imgData = ctx.getImageData(0, 0, canv.width, canv.height);
 
 	for (let i = 0; i < imgData.data.length; i += 4) {
 		let v = (imgData.data[i] + imgData.data[i + 1] + imgData.data[i + 2]) / 3;
@@ -421,5 +435,5 @@ function setNoise(noiseMul){
 	}
 
 	ctx.clearRect(0, 0, canv.width, canv.height);
-	ctx.putImageData(imgData, (canv.width - imgData.width) / 2, (canv.height - imgData.height) / 2);
+	ctx.putImageData(imgData, 0, 0);
 }

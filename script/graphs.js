@@ -106,7 +106,7 @@ function updateGraph(){
     }
     
     if(imgData != null){
-      imgData = ctx.getImageData((canv.width - width) / 2, (canv.height - height) / 2, width, height);
+      imgData = ctx.getImageData(0, 0, canv.width, canv.height);
       for(let i = 0; i < imgData.data.length; i += 4){
         brightnessPixel = imgData.data[i] * 0.3 + imgData.data[i + 1] * 0.59 + imgData.data[i + 2] * 0.11;
         arrayBrightness[brightnessPixel]++;

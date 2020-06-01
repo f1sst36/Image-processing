@@ -14,7 +14,7 @@ function brightness(){
 	ctx.clearRect(0, 0, canv.width, canv.height);
 	ctx.fillStyle = mainCanvasBGC;
 	ctx.fillRect(0, 0, canv.width, canv.height);
-	ctx.putImageData(imgData, (canv.width - imgData.width) / 2, (canv.height - imgData.height) / 2);
+	ctx.putImageData(imgData, 0, 0);
 
 	boolChanges = true;
 }

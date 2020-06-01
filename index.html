@@ -13,7 +13,7 @@
 
 <div class="container-fluid" style="height: 100%;">
 	<div class="row icons-row" style="height: 100%;">
-		<div class="col-lg-3 icons-colomn pr-0 pl-0" style="height: 100%;">
+		<div class="col-lg-3 icons-colomn pr-0 pl-0" style="height: 100%; position: relative; z-index: 2;">
 			<div class="row" style="height: 100%; width: 100%; margin: 0;">
 				<div class="col-lg-3 pr-0 pl-0">
 					<ul class="left-menu middle">
@@ -96,7 +96,10 @@
 			<div class="clear-button-outer">
 				<button onClick="ClearChanges()">Очистить изменения</button>
 			</div>
+			
 			<canvas id="canvas">no canvas</canvas>
+
+			<canvas id="BG-canvas">no bg canvas</canvas>
 			<div class="coords-bar">
 				<p class="coords"></p>
 			</div>

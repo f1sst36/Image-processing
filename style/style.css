@@ -299,15 +299,37 @@ button{
 	margin-bottom: 50px;
 }
 
-.canvas{
+#BG-canvas{
+	position: absolute;
+	top: 0;
+	left: 0;
 	width: 100%;
 	height: 100%;
+	z-index: 0;
+	opacity: 0.9;
+
+	-webkit-filter: blur(25px);
+    -moz-filter: blur(25px);
+    filter: blur(25px);
+}
+
+#canvas{
+	margin: auto;
 	display: block;
-	
+	position: relative;
+	z-index: 1;
+
+	width: 300px;
+	height:100px;
+	transform: translate(-50%, -50%);
+	position: absolute; 
+	top: 50%; 
+	left: 50%;
 }
 
 #canv-parent{
 	height: 100%;
+	vertical-align: middle;
 }
 
 .coords{
@@ -334,6 +356,7 @@ button{
 	position: absolute;
 	top: 20px;
 	right: 20px;
+	z-index: 2;
 }
 
 .clear-button-outer button{
@@ -364,12 +387,16 @@ button{
 }
 
 .about-window{
-	width: 500px;
-	max-height: 500px;
 	margin: 70px auto;
 	background-color: #fff;
 	padding-top: 10px;
 	border-radius: 3px;
+	
+	width: 500px;
+	transform: translate(-50%, -50%);
+	position: absolute; 
+	top: calc(50% - 150px); 
+	left: 50%;
 }
 
 .about-window h4{
@@ -404,6 +431,7 @@ button{
 	background-color: rgba(255, 40, 60, 0.6);
 	box-shadow: 3px 3px 7px 0px rgba(1, 1, 1, 0.5);
 	display: none;
+	z-index: 5;
 }
 
 .error p{
