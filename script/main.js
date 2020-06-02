@@ -437,3 +437,453 @@ function setNoise(noiseMul){
 	ctx.clearRect(0, 0, canv.width, canv.height);
 	ctx.putImageData(imgData, 0, 0);
 }
+
+function toMatrix(array, chunkSize) {
+    let R = [];
+    for (let i = 0; i < array.length; i += chunkSize)
+        R.push(array.slice(i, i + chunkSize));
+    return R;
+}
+
+function convolution(pixels, weights) {
+    let side = Math.round(Math.sqrt(weights.length));
+    let halfSide = Math.floor(side / 2);
+    let src = pixels.data;
+    let canvasWidth = pixels.width;
+    let canvasHeight = pixels.height;
+    let temporaryCanvas = document.createElement('canvas');
+    let temporaryCtx = temporaryCanvas.getContext('2d');
+    let outputData = temporaryCtx.createImageData(canvasWidth, canvasHeight);
+
+    for (let y = 0; y < canvasHeight; y++) {
+
+        for (let x = 0; x < canvasWidth; x++) {
+
+            let dstOff = (y * canvasWidth + x) * 4;
+            let sumReds = 0, sumGreens = 0, sumBlues = 0;
+
+            for (let kernelY = 0; kernelY < side; kernelY++) {
+                for (let kernelX = 0; kernelX < side; kernelX++) {
+
+                    let currentKernelY = y + kernelY - halfSide;
+                    let currentKernelX = x + kernelX - halfSide;
+
+                    if (currentKernelY >= 0 &&
+                        currentKernelY < canvasHeight &&
+                        currentKernelX >= 0 &&
+                        currentKernelX < canvasWidth) {
+
+                        let offset = (currentKernelY * canvasWidth + currentKernelX) * 4;
+                        let weight = weights[kernelY * side + kernelX];
+
+                        sumReds += src[offset] * weight;
+                        sumGreens += src[offset + 1] * weight;
+                        sumBlues += src[offset + 2] * weight;
+                    }
+                }
+            }
+
+            outputData.data[dstOff] = sumReds;
+            outputData.data[dstOff + 1] = sumGreens;
+            outputData.data[dstOff + 2] = sumBlues;
+            outputData.data[dstOff + 3] = 255;
+        }
+    }
+    return outputData;
+}
+
+const linear = document.querySelector('#linear');
+linear.addEventListener('click', LinearFilter)
+
+function LinearFilter(){
+    ctx.drawImage(img, 0, 0, canv.width, canv.height);
+
+	let imgData = ctx.getImageData(0, 0, canv.width, canv.height);
+
+    let temp = toMatrix(imgData.data, imgData.width * 4);
+
+    for (let i = 0; i < temp.length; i++)
+        temp[i] = toMatrix(temp[i], 4);
+
+    try {
+        for (let j = 0; j < canv.width; j++) {
+            for (let i = 0; i < canv.height; i++) {
+                if (i == 0 || j == 0 || i + 1 == canv.height || j + 1 == canv.width) { }
+                else {
+                    let r_summ = temp[i - 1][j - 1][0];
+                    let g_summ = temp[i - 1][j - 1][1];
+                    let b_summ = temp[i - 1][j - 1][2];
+
+                    r_summ = r_summ + temp[i - 1][j][0];
+                    g_summ = g_summ + temp[i - 1][j][1];
+                    b_summ = b_summ + temp[i - 1][j][2];
+
+                    r_summ += temp[i - 1][j + 1][0];
+                    g_summ += temp[i - 1][j + 1][1];
+                    b_summ += temp[i - 1][j + 1][2];
+
+                    r_summ = r_summ + temp[i][j - 1][0];
+                    g_summ = g_summ + temp[i][j - 1][1];
+                    b_summ = b_summ + temp[i][j - 1][2];
+
+                    r_summ = r_summ + temp[i][j][0];
+                    g_summ = g_summ + temp[i][j][1];
+                    b_summ = b_summ + temp[i][j][2];
+
+                    r_summ = r_summ + temp[i][j + 1][0];
+                    g_summ = g_summ + temp[i][j + 1][1];
+                    b_summ = b_summ + temp[i][j + 1][2];
+
+                    r_summ = r_summ + temp[i + 1][j - 1][0];
+                    g_summ = g_summ + temp[i + 1][j - 1][1];
+                    b_summ = b_summ + temp[i + 1][j - 1][2];
+
+                    r_summ = r_summ + temp[i + 1][j][0];
+                    g_summ = g_summ + temp[i + 1][j][1];
+                    b_summ = b_summ + temp[i + 1][j][2];
+
+                    r_summ = r_summ + temp[i + 1][j + 1][0];
+                    g_summ = g_summ + temp[i + 1][j + 1][1];
+                    b_summ = b_summ + temp[i + 1][j + 1][2];
+
+                    r_summ = r_summ / 9;
+                    g_summ = g_summ / 9;
+                    b_summ = b_summ / 9;
+
+                    temp[i][j][0] = Math.floor(r_summ);
+                    temp[i][j][1] = Math.floor(g_summ);
+                    temp[i][j][2] = Math.floor(b_summ);
+                }
+            }
+        }
+    }
+    catch{ }
+
+    temp = new Uint8ClampedArray(temp.toString().split(',').map(v => +v));
+
+    imgData.data.set(temp);
+
+	ctx.clearRect(0, 0, canv.width, canv.height);
+    ctx.putImageData(imgData, 0, 0);
+}
+
+
+let median = document.querySelector('#median')
+median.addEventListener('click', MedianFilter)
+function MedianFilter(){
+	ctx.drawImage(img, 0, 0, canv.width, canv.height);
+	let imgData = ctx.getImageData(0, 0, canv.width, canv.height);
+
+    let temp = toMatrix(imgData.data, imgData.width * 4);
+
+    for (let i = 0; i < temp.length; i++)
+        temp[i] = toMatrix(temp[i], 4);
+
+    for (let j = 0; j < canv.width; j++) {
+        for (let i = 0; i < canv.height; i++) {
+            if (i == 0 || j == 0 || i + 1 == canv.height || j + 1 == canv.width) { }
+            else {
+                let r_summ = [
+                    temp[i - 1][j - 1][0],
+                    temp[i - 1][j][0],
+                    temp[i - 1][j + 1][0],
+                    temp[i][j - 1][0],
+                    temp[i][j][0],
+                    temp[i][j + 1][0],
+                    temp[i + 1][j - 1][0],
+                    temp[i + 1][j][0],
+                    temp[i + 1][j + 1][0]
+                ];
+
+                let g_summ = [
+                    temp[i - 1][j - 1][1],
+                    temp[i - 1][j][1],
+                    temp[i - 1][j + 1][1],
+                    temp[i][j - 1][1],
+                    temp[i][j][1],
+                    temp[i][j + 1][1],
+                    temp[i + 1][j - 1][1],
+                    temp[i + 1][j][1],
+                    temp[i + 1][j + 1][1]
+                ];
+
+                let b_summ = [
+                    temp[i - 1][j - 1][2],
+                    temp[i - 1][j][2],
+                    temp[i - 1][j + 1][2],
+                    temp[i][j - 1][2],
+                    temp[i][j][2],
+                    temp[i][j + 1][2],
+                    temp[i + 1][j - 1][2],
+                    temp[i + 1][j][2],
+                    temp[i + 1][j + 1][2]
+                ];
+
+                r_summ.sort();
+                g_summ.sort();
+                b_summ.sort();
+
+                temp[i][j][0] = r_summ[4];
+                temp[i][j][1] = g_summ[4];
+                temp[i][j][2] = b_summ[4];
+            }
+        }
+    }
+
+    temp = new Uint8ClampedArray(temp.toString().split(',').map(v => +v));
+
+    imgData.data.set(temp);
+
+    ctx.clearRect(0, 0, canv.width, canv.height);
+    ctx.putImageData(imgData, 0, 0);
+}
+
+let cirsh = document.querySelector('#cirsh')
+cirsh.addEventListener('click', CirshFilter)
+function CirshFilter() {
+    ctx.drawImage(img, 0, 0, canv.width, canv.height);
+
+    let imgData = ctx.getImageData(0, 0, canv.width, canv.height);
+
+    let weight = [
+        -3, 5, 5,
+        -3, 0, 5,
+        -3, -3, -3
+    ];
+
+    imgData = convolution(imgData, weight);
+
+    ctx.putImageData(imgData, 0, 0, 0, 0, imgData.width, imgData.height);
+}
+
+let laplas = document.querySelector('#laplas')
+laplas.addEventListener('click', LaplasFilter)
+function LaplasFilter() {
+    ctx.drawImage(img, 0, 0, canv.width, canv.height);
+
+    let imgData = ctx.getImageData(0, 0, canv.width, canv.height);
+
+    let weight = [
+        -1, -2, -1,
+        -2, 12, -2,
+        -1, -2, -1
+    ]
+
+    imgData = convolution(imgData, weight)
+
+    ctx.putImageData(imgData, 0, 0, 0, 0, imgData.width, imgData.height);
+}
+
+let roberts = document.querySelector('#roberts')
+roberts.addEventListener('click', RobertsFilter)
+function RobertsFilter() {
+    ctx.drawImage(img, 0, 0, canv.width, canv.height);
+
+    let imgData = ctx.getImageData(0, 0, canv.width, canv.height);
+
+    let temp = toMatrix(imgData.data, imgData.width * 4);
+
+    for (let i = 0; i < temp.length; i++)
+        temp[i] = toMatrix(temp[i], 4);
+
+    for (let j = 0; j < canv.width; j++) {
+        for (let i = 0; i < canv.height; i++) {
+            if (i == 0 || j == 0 || i + 1 == canv.height || j + 1 == canv.width) { }
+            else {
+                let r = Math.abs(temp[i][j][0] - temp[i + 1][j + 1][0]) + Math.abs(temp[i][j + 1][0] - temp[i + 1][j][0]);
+                let g = Math.abs(temp[i][j][1] - temp[i + 1][j + 1][1]) + Math.abs(temp[i][j + 1][1] - temp[i + 1][j][1]);
+                let b = Math.abs(temp[i][j][2] - temp[i + 1][j + 1][2]) + Math.abs(temp[i][j + 1][2] - temp[i + 1][j][2]);
+
+                temp[i][j][0] = r;
+                temp[i][j][1] = g;
+                temp[i][j][2] = b;
+            }
+        }
+    }
+
+    temp = new Uint8ClampedArray(temp.toString().split(',').map(v => +v));
+
+    imgData.data.set(temp);
+
+    ctx.putImageData(imgData, 0, 0, 0, 0, imgData.width, imgData.height);
+}
+
+let sobel = document.querySelector('#sobel')
+sobel.addEventListener('click', SobelFilter)
+function SobelFilter() {
+    ctx.drawImage(img, 0, 0, canv.width, canv.height);
+
+    let imgData = ctx.getImageData(0, 0, canv.width, canv.height);
+    let temp = toMatrix(imgData.data, imgData.width * 4);
+    for (let i = 0; i < temp.length; i++)
+        temp[i] = toMatrix(temp[i], 4);
+
+    let temporaryCanvas = document.createElement('canvas');
+    let temporaryCtx = temporaryCanvas.getContext('2d');
+    let outputData = temporaryCtx.createImageData(canv.width, canv.height);
+    outputData = toMatrix(outputData.data, outputData.width * 4);
+    for (let i = 0; i < outputData.length; i++)
+        outputData[i] = toMatrix(outputData[i], 4);
+
+    for (let i = 0; i < canv.height; i++) {
+        for (let j = 0; j < canv.width; j++) {
+            if (i == 0 || j == 0 || i + 1 == canv.height || j + 1 == canv.width) { }
+            else {
+                let x_r =
+                    (temp[i - 1][j + 1][0] + 2 * temp[i][j + 1][0] + temp[i + 1][j + 1][0]) -
+                    (temp[i - 1][j - 1][0] + 2 * temp[i][j - 1][0] + temp[i + 1][j - 1][0]);
+                let y_r =
+                    (temp[i - 1][j - 1][0] + 2 * temp[i - 1][j][0] + temp[i - 1][j + 1][0]) -
+                    (temp[i + 1][j - 1][0] + 2 * temp[i + 1][j][0] + temp[i + 1][j + 1][0]);
+
+                let x_g =
+                    (temp[i - 1][j + 1][1] + 2 * temp[i][j + 1][1] + temp[i + 1][j + 1][1]) -
+                    (temp[i - 1][j - 1][1] + 2 * temp[i][j - 1][1] + temp[i + 1][j - 1][1]);
+                let y_g =
+                    (temp[i - 1][j - 1][1] + 2 * temp[i - 1][j][1] + temp[i - 1][j + 1][1]) -
+                    (temp[i + 1][j - 1][1] + 2 * temp[i + 1][j][1] + temp[i + 1][j + 1][1]);
+
+                let x_b =
+                    (temp[i - 1][j + 1][2] + 2 * temp[i][j + 1][2] + temp[i + 1][j + 1][2]) -
+                    (temp[i - 1][j - 1][2] + 2 * temp[i][j - 1][2] + temp[i + 1][j - 1][2]);
+                let y_b =
+                    (temp[i - 1][j - 1][2] + 2 * temp[i - 1][j][2] + temp[i - 1][j + 1][2]) -
+                    (temp[i + 1][j - 1][2] + 2 * temp[i + 1][j][2] + temp[i + 1][j + 1][2]);
+
+                let g_r = Math.sqrt(x_r * x_r + y_r * y_r);
+                let g_g = Math.sqrt(x_g * x_g + y_g * y_g);
+                let g_b = Math.sqrt(x_b * x_b + y_b * y_b);
+
+                outputData[i][j][0] = g_r;
+                outputData[i][j][1] = g_g;
+                outputData[i][j][2] = g_b;
+                outputData[i][j][3] = 255;
+            }
+        }
+    }
+
+    outputData = new Uint8ClampedArray(outputData.toString().split(',').map(v => +v));
+    imgData.data.set(outputData);
+
+    ctx.putImageData(imgData, 0, 0, 0, 0, imgData.width, imgData.height);
+}
+
+let uolles = document.querySelector('#uolles')
+uolles.addEventListener('click', UollesFilter)
+function UollesFilter() {
+    ctx.drawImage(img, 0, 0, canv.width, canv.height);
+
+    let imgData = ctx.getImageData(0, 0, canv.width, canv.height);
+    let temp = toMatrix(imgData.data, imgData.width * 4);
+    for (let i = 0; i < temp.length; i++)
+        temp[i] = toMatrix(temp[i], 4);
+
+    let temporaryCanvas = document.createElement('canvas');
+    let temporaryCtx = temporaryCanvas.getContext('2d');
+    let outputData = temporaryCtx.createImageData(canv.width, canv.height);
+    outputData = toMatrix(outputData.data, outputData.width * 4);
+    for (let i = 0; i < outputData.length; i++)
+        outputData[i] = toMatrix(outputData[i], 4);
+
+    for (let i = 0; i < canv.height; i++) {
+        for (let j = 0; j < canv.width; j++) {
+            if (i == 0 || j == 0 || i + 1 == canv.height || j + 1 == canv.width) { }
+            else {
+                let f_r = Math.log((
+                    ((temp[i][j][0] + 1) / (temp[i - 1][j][0] + 1)) *
+                    ((temp[i][j][0] + 1) / (temp[i][j + 1][0] + 1)) *
+                    ((temp[i][j][0] + 1) / (temp[i + 1][j][0] + 1)) *
+                    ((temp[i][j][0] + 1) / (temp[i][j - 1][0] + 1))
+                )) / 4;
+                let f_g = Math.log((
+                    ((temp[i][j][1] + 1) / (temp[i - 1][j][1] + 1)) *
+                    ((temp[i][j][1] + 1) / (temp[i][j + 1][1] + 1)) *
+                    ((temp[i][j][1] + 1) / (temp[i + 1][j][1] + 1)) *
+                    ((temp[i][j][1] + 1) / (temp[i][j - 1][1] + 1))
+                )) / 4;
+                let f_b = Math.log((
+                    ((temp[i][j][2] + 1) / (temp[i - 1][j][2] + 1)) *
+                    ((temp[i][j][2] + 1) / (temp[i][j + 1][2] + 1)) *
+                    ((temp[i][j][2] + 1) / (temp[i + 1][j][2] + 1)) *
+                    ((temp[i][j][2] + 1) / (temp[i][j - 1][2] + 1))
+                )) / 4;
+
+                outputData[i][j][0] = f_r * 1000;
+                outputData[i][j][1] = f_g * 1000;
+                outputData[i][j][2] = f_b * 1000;
+                outputData[i][j][3] = 255;
+            }
+        }
+    }
+
+    outputData = new Uint8ClampedArray(outputData.toString().split(',').map(v => +v));
+    imgData.data.set(outputData);
+
+    ctx.putImageData(imgData, 0, 0, 0, 0, imgData.width, imgData.height);
+}
+
+let static = document.querySelector('#static')
+static.addEventListener('click', StaticFilter)
+function StaticFilter() {
+    ctx.drawImage(img, 0, 0, canv.width, canv.height);
+
+    let imgData = ctx.getImageData(0, 0, canv.width, canv.height);
+    let temp = toMatrix(imgData.data, imgData.width * 4);
+    for (let i = 0; i < temp.length; i++)
+        temp[i] = toMatrix(temp[i], 4);
+
+    let temporaryCanvas = document.createElement('canvas');
+    let temporaryCtx = temporaryCanvas.getContext('2d');
+    let outputData = temporaryCtx.createImageData(canv.width, canv.height);
+    outputData = toMatrix(outputData.data, outputData.width * 4);
+    for (let i = 0; i < outputData.length; i++)
+        outputData[i] = toMatrix(outputData[i], 4);
+
+    for (let j = 0; j < canv.width; j++) {
+        for (let i = 0; i < canv.height; i++) {
+            if (i == 0 || j == 0 || i + 1 == canv.height || j + 1 == canv.width) { }
+            else {
+                let summ1_r = temp[i][j][0] + temp[i + 1][j][0] + temp[i][j + 1][0] + temp[i + 1][j + 1][0];
+                let summ1_g = temp[i][j][1] + temp[i + 1][j][1] + temp[i][j + 1][1] + temp[i + 1][j + 1][1];
+                let summ1_b = temp[i][j][2] + temp[i + 1][j][2] + temp[i][j + 1][2] + temp[i + 1][j + 1][2];
+
+                let mu_r = 1 / 4 * summ1_r;
+                let mu_g = 1 / 4 * summ1_g;
+                let mu_b = 1 / 4 * summ1_b;
+
+                let summ2_r = Math.pow((temp[i][j][0] - mu_r), 2) + Math.pow((temp[i + 1][j][0] - mu_r), 2) + Math.pow((temp[i][j + 1][0] - mu_r), 2) + Math.pow((temp[i + 1][j + 1][0] - mu_r), 2);
+                let summ2_g = Math.pow((temp[i][j][1] - mu_g), 2) + Math.pow((temp[i + 1][j][1] - mu_g), 2) + Math.pow((temp[i][j + 1][1] - mu_g), 2) + Math.pow((temp[i + 1][j + 1][1] - mu_g), 2);
+                let summ2_b = Math.pow((temp[i][j][2] - mu_b), 2) + Math.pow((temp[i + 1][j][2] - mu_b), 2) + Math.pow((temp[i][j + 1][2] - mu_b), 2) + Math.pow((temp[i + 1][j + 1][2] - mu_b), 2);
+
+                let tau_r = Math.sqrt(1 / 4 * summ2_r);
+                let tau_g = Math.sqrt(1 / 4 * summ2_g);
+                let tau_b = Math.sqrt(1 / 4 * summ2_b);
+
+                let val = -100;
+
+                outputData[i][j][0] = (tau_r * temp[i][j][0] + val);
+                outputData[i][j][1] = (tau_g * temp[i][j][1] + val);
+                outputData[i][j][2] = (tau_b * temp[i][j][2] + val);
+                outputData[i][j][3] = 255;
+                outputData[i][j + 1][0] = (tau_r * temp[i][j + 1][0] + val);
+                outputData[i][j + 1][1] = (tau_g * temp[i][j + 1][1] + val);
+                outputData[i][j + 1][2] = (tau_b * temp[i][j + 1][2] + val);
+                outputData[i][j + 1][3] = 255;
+
+                outputData[i + 1][j][0] = (tau_r * temp[i + 1][j][0] + val);
+                outputData[i + 1][j][1] = (tau_g * temp[i + 1][j][1] + val);
+                outputData[i + 1][j][2] = (tau_b * temp[i + 1][j][2] + val);
+                outputData[i + 1][j][3] = 255;
+                outputData[i + 1][j + 1][0] = (tau_r * temp[i + 1][j + 1][0] + val);
+                outputData[i + 1][j + 1][1] = (tau_g * temp[i + 1][j + 1][1] + val);
+                outputData[i + 1][j + 1][2] = (tau_b * temp[i + 1][j + 1][2] + val);
+                outputData[i + 1][j + 1][3] = 255;
+            }
+        }
+    }
+
+    outputData = new Uint8ClampedArray(outputData.toString().split(',').map(v => +v));
+    imgData.data.set(outputData);
+
+    ctx.putImageData(imgData, 0, 0, 0, 0, imgData.width, imgData.height);
+}

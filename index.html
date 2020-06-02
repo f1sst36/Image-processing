@@ -27,20 +27,20 @@
 				<div class="col-lg-9 pl-0 pr-0 icons-colomn-settings" style="height: 100%;">
 					<div class="big-buttons">
 						<h4 class="block-title">Изображение</h4>
-						<div class="big-button" id="buttonFile">
+						<div class="big-button buttn" id="buttonFile">
 							<i class="fa fa-download" aria-hidden="true"></i>
 							<input type="file" name="file" id="file" class="inputfile" accept="image/jpeg,image/jpg,image/png,image/bmp" />
-							<label for="file" style="margin: 0;"><p >Загрузить</p></label>
+							<label for="file" style="margin: 0; width: 100%; height: 100%;"><p >Загрузить</p></label>
 						</div>
-						<div class="big-button" id="downloadImg">
+						<div class="big-button buttn" id="downloadImg">
 							<i class="fa fa-upload" aria-hidden="true"></i>
 							<a href="" style="color: #4470a8;"><label style="margin: 0;">Скачать</label></a>
 						</div>
-						<div class="big-button" id="aboutImg">
+						<div class="big-button buttn" id="aboutImg">
 							<i class="fa fa-info" aria-hidden="true"></i>
 							<p>О файле</p>
 						</div>
-						<div class="big-button" onClick="ClearCanvas();">
+						<div class="big-button buttn" onClick="ClearCanvas();">
 							<i class="fa fa-eraser" aria-hidden="true"></i>
 							<p>Очистить</p>
 						</div>
@@ -63,17 +63,21 @@
 							<input class="color" type="color"> <input class="color" type="color"><br />
 							<input id="binarization" type="range" min="0" max="100" step="1" value="50" class="slider"><br />
 						</div>
-						<button onClick="TurnOnProfile()" class="big-button" style="margin: 30px auto;">Профиль яркости</button>
+						<button onClick="TurnOnProfile()" class="big-button buttn" style="margin: 30px auto;">Профиль яркости</button>
 						<!--<button onClick="ClearChanges()" class="big-button" style="margin: 10px auto;">Убрать все изменения</button>-->
 					</div>
 
 					<div class="true-filters" style="display: none;">
 						<h4 class="block-title">Фильтры</h4>
 						<div class="buttons">
-							<button>123</button>
-							<button>123</button>
-							<button>123</button>
-							<button>123</button>
+							<button id="linear">Линейный сглаживающий</button>
+							<button id="median">Нелинейный медианный</button>
+							<button id="cirsh">Метод Кирша</button>
+							<button id="laplas">Метод Лапласа</button>
+							<button id="roberts">Метод Робертса</button>
+							<button id="sobel">Метод Собела</button>
+							<button id="uolles">Метод Уоллеса</button>
+							<button id="static">Статистический метод</button>
 						</div>
 					</div>
 

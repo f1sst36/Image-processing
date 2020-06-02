@@ -146,8 +146,8 @@ button{
 	width: 90%;
 	height: 60px;
 	/*background-color: #1B212C;*/
-	border-top: 3px solid #fff;
-	border-radius: 20px;
+	/*border: 3px solid #fff;*/
+	border-radius: 5px;
 	margin: 10px auto;
 	color: #fff;
 	cursor: pointer;
@@ -229,11 +229,21 @@ button{
 	color: #fff;
 }
 
+.buttons button:hover{
+	background-color: #60ADF0;
+}
+
 .graphs{
 	color: #9CA2A5;
 	height: 100%;
 	overflow-y: scroll;
 }
+
+/* хром, сафари */
+.graphs::-webkit-scrollbar { width: 0; }
+
+/* ie 10+ */
+.graphs { -ms-overflow-style: none; }
 
 .graphs h5{
 	text-align: center;
@@ -301,12 +311,13 @@ button{
 
 #BG-canvas{
 	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
+	top: -5%;
+	left: -5%;
+	width: 110%;
+	height: 110%;
 	z-index: 0;
 	opacity: 0.9;
+	
 
 	-webkit-filter: blur(25px);
     -moz-filter: blur(25px);
@@ -371,7 +382,7 @@ button{
 }
 
 .clear-button-outer button:hover{
-	background-color: #04A4E9;
+	background-color: #60ADF0;
 }
 
 /*Pop out*/
@@ -581,3 +592,43 @@ animation-delay: 1s;
 #profile-pop-r, #profile-pop-g, #profile-pop-b{
 	
 }
+
+.buttn{
+	width: 90%;
+	height: 60px;
+	background: none;
+	border: 3px solid;
+	font-weight: 700;
+	cursor: pointer;
+	font-size: 16px;
+	position: relative;
+  }
+  
+  .buttn::before,.buttn::after{
+	content: "";
+	position: absolute;
+	width: 14px;
+	height: 4px;
+	background: #353b48;
+	transform: skewX(50deg);
+	transition: .4s linear;
+  }
+  
+  .buttn::before{
+	top: -4px;
+	left: 10%;
+  }
+  
+  .buttn::after{
+	bottom: -4px;
+	right: 10%;
+  }
+  
+  .buttn:hover::before{
+	left: 80%;
+  }
+  
+  .buttn:hover::after{
+	right: 80%;
+  }
+  
